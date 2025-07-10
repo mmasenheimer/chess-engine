@@ -76,7 +76,16 @@ class GameState():
     of valid moves
     '''
     def getPawnMoves(self, row, col, moves):
-        pass
+        if self.whiteToMove:
+            if self.board[row - 1][col] == "--":
+                # 1 square pawn advance
+                moves.append(Move(row, col), (row-1, col), self.board)
+                if row == 6 and self.board[row -2][col] == "--":
+                    # 2 square pawn advance
+                    moves.append(Move(row, col), (row-2, col), self.board)
+
+        
+
 
     '''
     Get all of the rook moves for a rook at row, col, and add the moves to the list
@@ -100,6 +109,16 @@ class Move ():
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        self.moveId = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        # Generating a unique ID for every move
+        print(self.moveId)
+    
+    def __eq__(self, other):
+
+        if isinstance(other, Move):
+            return self.moveId == other.moveId
+        
+        return False
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
