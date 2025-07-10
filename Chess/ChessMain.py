@@ -48,7 +48,9 @@ def main():
 
             if e.type == p.QUIT:
                 running = False
-            
+
+
+            # Mouse handlers
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
                 # Get the xy position of the mouse click
@@ -71,6 +73,13 @@ def main():
                     sqSelected = ()
                     # Reset the player clicks after a move is made
                     playerClicks = []
+            
+            # Key handlers
+            elif e.type == p.KEYDOWN:
+                if e.key == p.K_z:
+                    # Undo move when z is pressed
+                    gs.undo_move()
+            
 
 
             draw_game_state(screen, gs)    

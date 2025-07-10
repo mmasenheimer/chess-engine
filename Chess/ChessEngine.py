@@ -37,7 +37,27 @@ class GameState():
     '''
     def undo_move(self):
         if len(self.moveLog) != 0:
+            # Make sure there exists a move to undo
+
             move = self.moveLog.pop()
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove
+            # Switch turns back
+
+    
+    '''
+    All moves considering checks
+    '''
+    def get_valid_moves(self):
+        pass
+
+    '''
+    All moves without considering checks
+    '''
+
+    def get_all_possible_moves(self):
+        pass
 
 
 class Move ():
