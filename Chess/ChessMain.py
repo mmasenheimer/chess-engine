@@ -35,6 +35,10 @@ def main():
     gs = ChessEngine.GameState()
     # Create the chess board
 
+    valid_moves = gs.get_valid_moves()
+    move_made = False
+    # Flag for when a valid move is made
+
     load_images()
 
     running = True
@@ -69,7 +73,11 @@ def main():
                 if (len(playerClicks) == 2):
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
-                    gs.make_move(move)
+
+                    if move in valid_moves:
+                        gs.make_move(move)
+                        move_made = True
+                  
                     sqSelected = ()
                     # Reset the player clicks after a move is made
                     playerClicks = []
@@ -79,12 +87,15 @@ def main():
                 if e.key == p.K_z:
                     # Undo move when z is pressed
                     gs.undo_move()
-            
+                    move_made = True
+        
+        if move_made:
+            valid_moves = gs.get_valid_moves()
+            move_made = False
 
-
-            draw_game_state(screen, gs)    
-            clock.tick(MAX_FPS)
-            p.display.flip()
+        draw_game_state(screen, gs)    
+        clock.tick(MAX_FPS)
+        p.display.flip()
 
 def draw_game_state(screen, gs):
     draw_board(screen, )  

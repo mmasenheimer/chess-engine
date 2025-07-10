@@ -50,14 +50,41 @@ class GameState():
     All moves considering checks
     '''
     def get_valid_moves(self):
-        pass
+        # Do not worry about checks right now
+        return self.get_all_possible_moves()
+
 
     '''
     All moves without considering checks
     '''
-
     def get_all_possible_moves(self):
+        moves = []
+        for row in range(len(self.board)):
+            for col in range(len(self.board[row])):
+                turn = self.board[row][col][0]
+                if (turn == "w" and self.whiteToMove) and (turn == "b" and not self.whiteToMove):
+                    piece = self.board[row][col][1]
+                    if piece == 'p':
+                        self.getPawnMoves(row, col, moves)
+                    
+                    elif piece == "R":
+                        self.getRookMoves(row, col, moves)
+        return moves
+    
+    '''
+    Get all of the pawn moves for a pawn at row, col, and add the moves to the list
+    of valid moves
+    '''
+    def getPawnMoves(self, row, col, moves):
         pass
+
+    '''
+    Get all of the rook moves for a rook at row, col, and add the moves to the list
+    of valid moves
+    '''
+    def getRookMoves(self, row, col, moves):
+        pass
+
 
 
 class Move ():
