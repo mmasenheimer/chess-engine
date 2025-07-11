@@ -76,9 +76,11 @@ def main():
                         gs.make_move(move)
                         move_made = True
                   
-                    sqSelected = ()
-                    # Reset the player clicks after a move is made
-                    playerClicks = []
+                        sqSelected = ()
+                        # Reset the player clicks after a move is made
+                        playerClicks = []
+                    else:
+                        playerClicks = [sqSelected]
             
             # Key handlers
             elif e.type == p.KEYDOWN:
