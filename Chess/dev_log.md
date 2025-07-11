@@ -16,4 +16,4 @@
 # 7/11/25
 
 - Added in valid pawn moves
--
+- Added in valid rook moves

@@ -109,13 +109,37 @@ class GameState():
                 if self.board[row + 1][col+1][0] == "w":
                     moves.append(Move((row, col), (row-1, col+1), self.board))
 
+        # Add pawn promotions later
+
 
     '''
     Get all of the rook moves for a rook at row, col, and add the moves to the list
     of valid moves
     '''
     def getRookMoves(self, row, col, moves):
-        pass
+        possibleDir = ((-1, 0), (0, -1), (1, 0), (0, 1))
+        enemyColor = "b" if self.whiteToMove else "w"
+
+        for direction in possibleDir:
+            for i in range(1, 8):
+                endRow = row + direction[0] * i
+                endCol = col + direction[1] * i
+                if 0 <= endRow < 8 and 0 <= endCol < 8:
+                    # On the board
+                    endPiece = self.board[endRow][endCol]
+
+                    if endPiece == "--":
+                        moves.append(Move((row, col), (endRow, endCol), self.board))
+
+                    elif endPiece[0] == enemyColor:
+                        moves.append(Move((row, col), (endRow, endCol), self.board))
+                        break
+                    else:
+                        # Friendly piece invalid
+                        break
+                else:
+                    # Off the board
+                    break
 
     def getBishopMoves(self, row, col, moves):
         pass
