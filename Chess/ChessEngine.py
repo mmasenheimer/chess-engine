@@ -22,6 +22,9 @@ class GameState():
             "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves}
         self.whiteToMove = True
         self.moveLog = []
+        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (0, 4)
+
 
     '''
     Takes a Move as a parameter and executes it 
@@ -33,6 +36,15 @@ class GameState():
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
         self.whiteToMove = not self.whiteToMove
+        # Updating the king's location
+
+        if move.pieceMoved == "wK":
+            self.whiteKingLocation = (move.startRow, move.endCol)
+
+        if move.pieceMoved == "bK":
+            self.blackKingLocation = (move.startRow, move.endCol)
+
+
 
     '''
     Undo the last move made
@@ -51,8 +63,34 @@ class GameState():
     All moves considering checks
     '''
     def get_valid_moves(self):
-        # Do not worry about checks right now
-        return self.get_all_possible_moves()
+        # Naive algorithm:
+        # 1. Generate all possible moves
+        moves = self.get_all_possible_moves()
+        # 2. For each move, make the move
+        for i in range(len(moves) - 1, -1, -1):
+            self.makeMove(moves[i])
+        # 3. Generate all oponent's moves
+        # 4. For each oponents moves, see if they attack the king
+        # 5. If they do attack the king, then it isn't a valid move
+        return moves
+    
+    '''
+    Determine if the current player is in check
+    '''
+    def inCheck(self):
+        if self.whiteToMove:
+            return self.squareUnderAttack(self.whiteKingLocation[0], self.whiteKingLocation[1])
+        
+        else:
+            return self.squareUnderAttack(self.blackKingLocation[0], self.blackKingLocation[1])
+
+    '''
+    Determine if there is a square under attack
+    '''
+    def squareUnderAttack(self, row, col):
+        pass
+
+
 
     '''
     All moves without considering checks
@@ -73,6 +111,7 @@ class GameState():
     Get all of the pawn moves for a pawn at row, col, and add the moves to the list
     of valid moves
     '''
+
     def getPawnMoves(self, row, col, moves):
 
         if self.whiteToMove:
@@ -108,6 +147,7 @@ class GameState():
             if col + 1 <= 7: # Captures to the right
                 if self.board[row + 1][col+1][0] == "w":
                     moves.append(Move((row, col), (row-1, col+1), self.board))
+
 
         # Add pawn promotions later
 
