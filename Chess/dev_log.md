@@ -11,3 +11,9 @@
 # 7/10/25
 
 - Started the calculate valid move and calculate valid move with check
+- Created test scripts
+
+# 7/11/25
+
+- Added in valid pawn moves
+-

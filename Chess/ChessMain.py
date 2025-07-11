@@ -9,7 +9,6 @@ import ChessEngine
 WIDTH = 512
 HEIGHT = 512
 DIMENSION = 8
-
 SQ_SIZE = HEIGHT // DIMENSION  
 # Size of each square on the chess board
 
@@ -53,7 +52,6 @@ def main():
             if e.type == p.QUIT:
                 running = False
 
-
             # Mouse handlers
             elif e.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
@@ -93,19 +91,20 @@ def main():
             valid_moves = gs.get_valid_moves()
             move_made = False
 
-        draw_game_state(screen, gs)    
+        draw_game_state(screen, gs)   
         clock.tick(MAX_FPS)
         p.display.flip()
 
 def draw_game_state(screen, gs):
-    draw_board(screen, )  
+    draw_board(screen)  
     # Draw squares on the board
 
     draw_pieces(screen, gs.board)  
     # Draw pieces on top of those squares
 
-
 def draw_board(screen):
+    
+    screen.fill(p.Color("white"))
     colors = [p.Color("white"), p.Color("gray")]
 
     for row in range(DIMENSION):
@@ -117,6 +116,7 @@ def draw_board(screen):
 
 
 def draw_pieces(screen, board):
+   
     for row in range(DIMENSION):
 
         for col in range(DIMENSION):
@@ -126,10 +126,5 @@ def draw_pieces(screen, board):
                 # If the square is not empty
                 screen.blit(IMAGES[piece], p.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-    
-
 if __name__ == "__main__":
     main()
-
-
-

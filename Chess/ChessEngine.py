@@ -18,6 +18,8 @@ class GameState():
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        self.moveFunctions = {'P': self.getPawnMoves, "R": self.getRookMoves, "N": self.getKnightMoves,
+            "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves}
         self.whiteToMove = True
         self.moveLog = []
 
@@ -44,7 +46,6 @@ class GameState():
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
             # Switch turns back
-
     
     '''
     All moves considering checks
@@ -52,7 +53,6 @@ class GameState():
     def get_valid_moves(self):
         # Do not worry about checks right now
         return self.get_all_possible_moves()
-
 
     '''
     All moves without considering checks
@@ -62,13 +62,11 @@ class GameState():
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 turn = self.board[row][col][0]
-                if (turn == "w" and self.whiteToMove) and (turn == "b" and not self.whiteToMove):
-                    piece = self.board[row][col][1]
-                    if piece == 'p':
-                        self.getPawnMoves(row, col, moves)
+                if (turn == "w" and self.whiteToMove) or (turn == "b" and not self.whiteToMove):
                     
-                    elif piece == "R":
-                        self.getRookMoves(row, col, moves)
+                    piece = self.board[row][col][1]
+                    self.moveFunctions[piece](row, col, moves)
+                    
         return moves
     
     '''
@@ -76,15 +74,40 @@ class GameState():
     of valid moves
     '''
     def getPawnMoves(self, row, col, moves):
+
         if self.whiteToMove:
             if self.board[row - 1][col] == "--":
                 # 1 square pawn advance
-                moves.append(Move(row, col), (row-1, col), self.board)
-                if row == 6 and self.board[row -2][col] == "--":
+                moves.append(Move((row, col), (row-1, col), self.board))
+                if row == 6 and self.board[row - 2][col] == "--":
                     # 2 square pawn advance
-                    moves.append(Move(row, col), (row-2, col), self.board)
+                    moves.append(Move((row, col), (row - 2, col), self.board))
 
-        
+            if col - 1 >= 0: # Captures to the left
+                if self.board[row-1][col-1][0] == "b":
+                    # Enemy piece exists here
+                    moves.append(Move((row, col), (row-1, col-1), self.board))
+                
+            if col + 1 <= 7: # Captures to the right
+                if self.board[row-1][col+1][0] == "b":
+                    moves.append(Move((row, col), (row-1, col+1), self.board))
+
+        else: # Black to move
+            if self.board[row+1][col] == "--":
+                # 1 square pawn advance
+                moves.append(Move((row, col), (row+1, col), self.board))
+                if row == 1 and self.board[row + 2][col] == "--":
+                    # 2 square pawn advance
+                    moves.append(Move((row, col), (row + 2, col), self.board))
+            
+            if col - 1 >= 0: # Captures to the left
+                if self.board[row + 1][col - 1][0] == "w":
+                    # Enemy piece exists here
+                    moves.append(Move((row, col), (row+1, col-1), self.board))
+                
+            if col + 1 <= 7: # Captures to the right
+                if self.board[row + 1][col+1][0] == "w":
+                    moves.append(Move((row, col), (row-1, col+1), self.board))
 
 
     '''
@@ -93,6 +116,19 @@ class GameState():
     '''
     def getRookMoves(self, row, col, moves):
         pass
+
+    def getBishopMoves(self, row, col, moves):
+        pass
+
+    def getKnightMoves(self, row, col, moves):
+        pass
+
+    def getQueenMoves(self, row, col, moves):
+        pass
+
+    def getKingMoves(self, row, col, moves):
+        pass
+
 
 
 
@@ -126,5 +162,3 @@ class Move ():
 
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
-
-        
