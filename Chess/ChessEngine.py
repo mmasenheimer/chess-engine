@@ -18,6 +18,7 @@ class GameState():
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
             ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
+        
         self.moveFunctions = {'P': self.getPawnMoves, "R": self.getRookMoves, "N": self.getKnightMoves,
             "B": self.getBishopMoves, "Q": self.getQueenMoves, "K": self.getKingMoves}
         self.whiteToMove = True
@@ -88,7 +89,20 @@ class GameState():
     Determine if there is a square under attack
     '''
     def squareUnderAttack(self, row, col):
-        pass
+        self.whiteToMove = not self.whiteToMove
+        # Switch to opponent's turn
+        oppMoves = self.get_all_possible_moves()
+        self.whiteToMove = not self.whiteToMove
+        for move in oppMoves:
+            if move.endRow == row and move.endCol == col:
+                # Square is under attack
+                self.whiteToMove = not self.whiteToMove
+                return True
+            
+
+        self.whiteToMove = not self.whiteToMove
+
+
 
 
 
