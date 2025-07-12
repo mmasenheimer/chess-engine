@@ -15,5 +15,5 @@
 
 # 7/11/25
 
-- Added in valid pawn moves
-- Added in valid rook moves
+- Added in valid pawn, rook, queen, knight, king, bishop moves
+- Implemented an inefficient algoithm for checks, check mates, and stalemates

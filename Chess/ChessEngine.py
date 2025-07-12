@@ -25,7 +25,8 @@ class GameState():
         self.moveLog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
-
+        self.checkMate = False
+        self.staleMate = False
 
     '''
     Takes a Move as a parameter and executes it 
@@ -40,12 +41,10 @@ class GameState():
         # Updating the king's location
 
         if move.pieceMoved == "wK":
-            self.whiteKingLocation = (move.startRow, move.endCol)
+            self.whiteKingLocation = (move.endRow, move.endCol)
 
         if move.pieceMoved == "bK":
-            self.blackKingLocation = (move.startRow, move.endCol)
-
-
+            self.blackKingLocation = (move.endRow, move.endCol)
 
     '''
     Undo the last move made
@@ -69,10 +68,24 @@ class GameState():
         moves = self.get_all_possible_moves()
         # 2. For each move, make the move
         for i in range(len(moves) - 1, -1, -1):
-            self.makeMove(moves[i])
+            self.make_move(moves[i])
         # 3. Generate all oponent's moves
         # 4. For each oponents moves, see if they attack the king
-        # 5. If they do attack the king, then it isn't a valid move
+            self.whiteToMove = not self.whiteToMove
+            if self.inCheck():
+                # 5. If they do attack the king, then it isn't a valid move
+                moves.remove(moves[i])
+            self.whiteToMove = not self.whiteToMove
+            self.undo_move()
+            if len(moves) == 0:
+                # Either checkmate or stalemate
+                if self.inCheck():
+                    self.checkMate = True
+                else:
+                    self.staleMate = True
+            else:
+                self.checkMate = False
+                self.staleMate = False
         return moves
     
     '''
@@ -99,12 +112,7 @@ class GameState():
                 self.whiteToMove = not self.whiteToMove
                 return True
             
-
         self.whiteToMove = not self.whiteToMove
-
-
-
-
 
     '''
     All moves without considering checks
@@ -250,7 +258,6 @@ class GameState():
                     # Not an ally piece
                     moves.append(Move((row, col), (endRow, endCol), self.board))
 
-
 class Move ():
     ranksToRows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
     rowsToRanks = {v: k for k, v in ranksToRows.items()}
@@ -278,6 +285,5 @@ class Move ():
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
     
-
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
