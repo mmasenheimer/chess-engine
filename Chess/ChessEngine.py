@@ -92,7 +92,55 @@ class GameState():
         # return moves
         # ----Faster algorithm----
         moves = []
-        self.inCheck, self
+        self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
+        if self.whiteToMove:
+            kingRow = self.whiteKingLocation[0]
+            kingCol = self.whiteKingLocation[1]
+
+        else:
+            kingRow = self.blackKingLocation[0]
+            kingCol = self.blackKingLocation[1]
+        # Getting which king
+        
+        if self.inCheck:
+            if len(self.checks) == 1:
+                # Only one check--block check or move the king
+                moves = self.getAllPossibleMoves()
+                # To block a check, need to move a piece between the attacker piece and the king
+                check = self.cheks[0]
+                checkRow = check[0]
+                checkCol = check[1]
+                pieceChecking = self.board[checkRow][checkCol]
+                # Location of the enemy piece causing the check
+                validSquares = []
+                # Valid squares that pieces can move to
+                if pieceChecking[1] == "N":
+                    # If attacking is a knight, the player must capture the knight or move king
+                    validSquares = [(checkRow, checkCol)]
+                else:
+                    for i in range(1, 8):
+                        validSquare = (kingRow + check[2] * i, kingCol + check[3] * i)
+                        # Where check[2] and check[3] are the check directions
+                        validSquares.append(validSquare)
+
+                        if validSquare[0] == checkRow and validSquare[1] == checkCol:
+                            break
+                for i in range(len(moves) -1, -1, -1):
+                    # Getting rid of moves that don't block check or move king
+                    if moves[i].pieceMoved[1] != "K":
+                        # Move doesn't move king so it must block or capture
+                        if not (moves[i].endRow, moves[i].endCol) in validSquares:
+                            # Move doesn't block check or capture piece
+                            moves.remove(moves[i])
+            else:
+                # 2X check, king has to move
+                self.getKingMoves(kingRow, kingCol, moves)
+        else:
+            # Not in check so all moves are fine
+            moves = self.get_all_possible_moves()
+        return moves
+    
+
     
     '''
     Determine if the current player is in check
@@ -129,7 +177,6 @@ class GameState():
             for col in range(len(self.board[row])):
                 turn = self.board[row][col][0]
                 if (turn == "w" and self.whiteToMove) or (turn == "b" and not self.whiteToMove):
-                    
                     piece = self.board[row][col][1]
                     self.moveFunctions[piece](row, col, moves)
                     
@@ -141,41 +188,54 @@ class GameState():
     '''
 
     def getPawnMoves(self, row, col, moves):
+        piecePinned = False
+        pinDirection = ()
+        for i in range(len(self.pins) - 1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piecePinned = True
+                pinDirection = (self.pins[i][2], self.pins[i][3])
+                self.pins.remove(self.pins[i])
+                break
+
 
         if self.whiteToMove:
             if self.board[row - 1][col] == "--":
                 # 1 square pawn advance
-                moves.append(Move((row, col), (row-1, col), self.board))
-                if row == 6 and self.board[row - 2][col] == "--":
-                    # 2 square pawn advance
+                if not piecePinned or pinDirection == (-1, 0):
                     moves.append(Move((row, col), (row - 2, col), self.board))
-
+                    if row == 6 and self.board[row - 2][col] == "--":
+                        # 2 square pawn advance
+                        moves.append(Move((row, col), (row - 1, col - 1), self.board))
+            # Captures
             if col - 1 >= 0: # Captures to the left
                 if self.board[row-1][col-1][0] == "b":
-                    # Enemy piece exists here
-                    moves.append(Move((row, col), (row-1, col-1), self.board))
+                    if not piecePinned or pinDirection == (-1, -1):
+                        moves.append(Move((row, col), (row - 2, col), self.board))
                 
             if col + 1 <= 7: # Captures to the right
                 if self.board[row-1][col+1][0] == "b":
-                    moves.append(Move((row, col), (row-1, col+1), self.board))
+                    if not piecePinned or pinDirection == (-1, 1):
+                        moves.append(Move((row, col), (row - 1, col + 1), self.board))
 
         else: # Black to move
             if self.board[row+1][col] == "--":
                 # 1 square pawn advance
-                moves.append(Move((row, col), (row+1, col), self.board))
-                if row == 1 and self.board[row + 2][col] == "--":
-                    # 2 square pawn advance
-                    moves.append(Move((row, col), (row + 2, col), self.board))
+                if not piecePinned or pinDirection == (1, 0):
+                    moves.append(Move((row, col), (row + 1, col), self.board))
+                    if row == 1 and self.board[row + 2][col] == "--":
+                        # 2 square pawn advance
+                        moves.append(Move((row, col), (row + 2, col), self.board))        
             
             if col - 1 >= 0: # Captures to the left
                 if self.board[row + 1][col - 1][0] == "w":
                     # Enemy piece exists here
-                    moves.append(Move((row, col), (row+1, col-1), self.board))
+                    if not piecePinned or pinDirection == (1, -1):
+                        moves.append(Move((row, col), (row+1, col-1), self.board))
                 
             if col + 1 <= 7: # Captures to the right
                 if self.board[row + 1][col+1][0] == "w":
-                    moves.append(Move((row, col), (row-1, col+1), self.board))
-
+                    if not piecePinned or pinDirection == (1, 1):
+                        moves.append(Move((row, col), (row+1, col+1), self.board))
 
         # Add pawn promotions later
 
@@ -184,6 +244,21 @@ class GameState():
     of valid moves
     '''
     def getRookMoves(self, row, col, moves):
+        piecePinned = False
+        pinDirection = ()
+        for i in range(len(self.pins) - 1, -1, -1):
+            if self.pins[i][0] == row and self.pins[i][1] == col:
+                piecePinned = True
+                pinDirection = (self.pins[i][2], self.pins[i][3])
+                if self.board[row][col][1] != "Q":
+                    # Can't remove the queen from pin on rook moves
+                    self.pins.remove(self.pins[i])
+                    break
+        directions = ((-1, 0), (0, -1))
+
+        # TODO continue here
+
+
         possibleDir = ((-1, 0), (0, -1), (1, 0), (0, 1))
         enemyColor = "b" if self.whiteToMove else "w"
 
@@ -264,6 +339,11 @@ class GameState():
                     # Not an ally piece
                     moves.append(Move((row, col), (endRow, endCol), self.board))
     
+    '''
+    This function generates a list of all the pieces that are pinned,
+    all the squares that are causing a check, and whether or not the
+    king is currently in check
+    '''
     def checkForPinsAndChecks(self):
         pins = []
         # Squares where the allied pinned piece is and direction pinned from
@@ -329,7 +409,11 @@ class GameState():
                         else:
                             # Enemy piece not applying check
                             break
-        # CHeck for knight checks
+                else:
+                    # Off the board
+                    break
+
+        # Check for knight checks
         knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         for m in knightMoves:
             endRow = startRow + m[0]
@@ -341,9 +425,6 @@ class GameState():
                     inCheck = True
                     checks.append((endRow, endCol, m[0], m[1]))
         return inCheck, pins, checks
-
-
-                    
 
 class Move ():
     ranksToRows = {"1": 7, "2": 6, "3": 5, "4": 4, "5": 3, "6": 2, "7": 1, "8": 0}
