@@ -423,6 +423,7 @@ class GameState():
                     # Enemy knight is attacking the king
                     inCheck = True
                     checks.append((endRow, endCol, m[0], m[1]))
+                    the = 1
         return inCheck, pins, checks
 
 class Move ():
@@ -454,3 +455,6 @@ class Move ():
     
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
+    
+
+    # TODO clean up naive method
