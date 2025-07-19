@@ -258,7 +258,6 @@ class GameState():
 
         # TODO continue here
 
-
         possibleDir = ((-1, 0), (0, -1), (1, 0), (0, 1))
         enemyColor = "b" if self.whiteToMove else "w"
 
