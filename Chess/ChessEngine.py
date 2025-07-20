@@ -262,6 +262,12 @@ class GameState():
         possibleDir = ((-1, 0), (0, -1), (1, 0), (0, 1))
         enemyColor = "b" if self.whiteToMove else "w"
 
+        for dir in directions:
+            for i in range(1, 8):
+                endRow = row + dir[0] * i
+                endCol = col + dir[1] * i
+                
+
         for direction in possibleDir:
             for i in range(1, 8):
                 endRow = row + direction[0] * i
