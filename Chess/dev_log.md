@@ -20,4 +20,7 @@
 
 # 7/14/25
 
-- Implemented a faster algorithm
+- Implemented a faster algorithm, which squares relative to the king, with
+  pins and checks/checkmates
+
+# 7/19/25
