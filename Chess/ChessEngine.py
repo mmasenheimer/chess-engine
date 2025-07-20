@@ -266,28 +266,14 @@ class GameState():
             for i in range(1, 8):
                 endRow = row + dir[0] * i
                 endCol = col + dir[1] * i
-                
-
-        for direction in possibleDir:
-            for i in range(1, 8):
-                endRow = row + direction[0] * i
-                endCol = col + direction[1] * i
                 if 0 <= endRow < 8 and 0 <= endCol < 8:
                     # On the board
-                    endPiece = self.board[endRow][endCol]
-
-                    if endPiece == "--":
-                        moves.append(Move((row, col), (endRow, endCol), self.board))
-
-                    elif endPiece[0] == enemyColor:
-                        moves.append(Move((row, col), (endRow, endCol), self.board))
-                        break
-                    else:
-                        # Friendly piece invalid
-                        break
-                else:
-                    # Off the board
-                    break
+                    if not piecePinned or pinDirection == dir or pinDirection == (-dir[0], -dir[1]):
+                        endPiece = self.board[endRow][endCol]
+                        if endPiece == "--":
+                            # Valid empty space
+                            moves.append(Move((row, col), (endRow, endCol), self.board))
+                            
 
     def getBishopMoves(self, row, col, moves):
         possibleDir = ((-1, -1), (-1, 1), (1, -1), (1, 1))
