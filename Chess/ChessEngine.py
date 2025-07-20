@@ -254,7 +254,8 @@ class GameState():
                     # Can't remove the queen from pin on rook moves
                     self.pins.remove(self.pins[i])
                     break
-        directions = ((-1, 0), (0, -1))
+        directions = ((-1, 0), (0, -1), (1, 0), (0, 1))
+        enemyColor = "b" if self.whiteToMove else "w"
 
         # TODO continue here
 
@@ -423,7 +424,6 @@ class GameState():
                     # Enemy knight is attacking the king
                     inCheck = True
                     checks.append((endRow, endCol, m[0], m[1]))
-                    the = 1
         return inCheck, pins, checks
 
 class Move ():
