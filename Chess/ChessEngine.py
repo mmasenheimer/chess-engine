@@ -44,8 +44,14 @@ class GameState():
         if move.pieceMoved == "wK":
             self.whiteKingLocation = (move.endRow, move.endCol)
 
-        if move.pieceMoved == "bK":
+        elif move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
+        
+        # Pawn promotion
+        if move.isPawnPromotion:
+            self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
+            # Grab the color of the pawn and then make it a queen
+
 
     """Undo the last move made"""
     def undo_move(self):
@@ -448,6 +454,10 @@ class Move ():
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveId = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
         # Generating a unique ID for every move
+        self.isPawnPromotion = False
+        if (self.pieceMoved == "wP" and self.endRow == 0) or (self.pieceMoved == "bP" and self.endRow == 7):
+            self.isPawnPromotion = True
+        
         print(self.moveId)
     
     def __eq__(self, other):
