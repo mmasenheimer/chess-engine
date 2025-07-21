@@ -24,3 +24,5 @@
   pins and checks/checkmates
 
 # 7/19/25
+
+- Implemented en passant and pawn promotion

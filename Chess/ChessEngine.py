@@ -5,7 +5,6 @@ It also keeps a move log.
 '''
 
 class GameState():
-
     def __init__(self):
         # Board representation is 8x8, char1 = color, char2 = piece type
         self.board = [
@@ -35,7 +34,6 @@ class GameState():
     Takes a Move as a parameter and executes it 
     (will not work for castling, pawn promotion, and en-passant)
     '''
-
     def make_move(self, move):
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
@@ -49,9 +47,7 @@ class GameState():
         if move.pieceMoved == "bK":
             self.blackKingLocation = (move.endRow, move.endCol)
 
-    '''
-    Undo the last move made
-    '''
+    """Undo the last move made"""
     def undo_move(self):
         if len(self.moveLog) != 0:
             # Make sure there exists a move to undo
@@ -177,7 +173,6 @@ class GameState():
                 self.pins.remove(self.pins[i])
                 break
 
-
         if self.whiteToMove:
             if self.board[row - 1][col] == "--":
                 # 1 square pawn advance
@@ -185,12 +180,12 @@ class GameState():
                     moves.append(Move((row, col), (row - 1, col), self.board))
                     if row == 6 and self.board[row - 2][col] == "--":
                         # 2 square pawn advance
-                        moves.append(Move((row, col), (row - 2, col - 1), self.board))
+                        moves.append(Move((row, col), (row - 2, col), self.board))
             # Captures
             if col - 1 >= 0: # Captures to the left
                 if self.board[row-1][col-1][0] == "b":
                     if not piecePinned or pinDirection == (-1, -1):
-                        moves.append(Move((row, col), (row - 2, col), self.board))
+                        moves.append(Move((row, col), (row - 1, col), self.board))
                 
             if col + 1 <= 7: # Captures to the right
                 if self.board[row-1][col+1][0] == "b":

@@ -72,14 +72,16 @@ def main():
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                     print(move.getChessNotation())
 
-                    if move in valid_moves:
-                        gs.make_move(move)
-                        move_made = True
-                  
-                        sqSelected = ()
-                        # Reset the player clicks after a move is made
-                        playerClicks = []
-                    else:
+                    for i in range(len(valid_moves)):
+
+                        if move == valid_moves[i]:
+                            gs.make_move(move)
+                            move_made = True
+                    
+                            sqSelected = ()
+                            # Reset the player clicks after a move is made
+                            playerClicks = []
+                    if not move_made:
                         playerClicks = [sqSelected]
             
             # Key handlers
