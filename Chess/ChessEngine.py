@@ -37,16 +37,6 @@ class GameState():
     (will not work for castling, pawn promotion, and en-passant)
     '''
     def make_move(self, move):
-        # En passant
-        if move.isEnpassantMove:
-            self.board[move.startRow][move.endCol] = '--'
-            # Capturing the pawn
-        
-        if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
-            # Only on two square pawn advances
-            self.enpassantPossible = ((move.endRow + move.startRow) // 2, move.endCol)
-        else:
-            self.enpassantPossible = ()
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
@@ -63,6 +53,20 @@ class GameState():
         if move.isPawnPromotion:
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
             # Grab the color of the pawn and then make it a queen
+        
+        if move.isEnpassantMove:
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            # Remove the pawn being captured (it's on the previous row, same col as end)
+            if move.pieceMoved[0] == 'w':
+                self.board[move.endRow + 1][move.endCol] = '--'
+            else:
+                self.board[move.endRow - 1][move.endCol] = '--'
+
+        if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
+            # Only on two square pawn advances
+            self.enpassantPossible = ((move.endRow + move.startRow) // 2, move.endCol)
+        else:
+            self.enpassantPossible = ()
 
 
     """Undo the last move made"""
@@ -99,7 +103,6 @@ class GameState():
         # # 3. Generate all oponent's moves
         # # 4. For each oponents moves, see if they attack the king
         # ----Faster algorithm----
-        tempEnpassantPossible = self.enpassantPossible
         moves = []
         self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
         if self.whiteToMove:
@@ -148,7 +151,6 @@ class GameState():
             # Not in check so all moves are fine
             moves = self.get_all_possible_moves()
 
-        self.enpassantPossible = tempEnpassantPossible
         return moves
     
     '''
