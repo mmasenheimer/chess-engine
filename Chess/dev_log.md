@@ -26,3 +26,7 @@
 # 7/19/25
 
 - Implemented en passant and pawn promotion
+
+# 7/21/2025
+
+- Added a highlight move feature and move animations

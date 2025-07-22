@@ -24,7 +24,7 @@ class GameState():
         self.moveLog = []
         self.whiteKingLocation = (7, 4)
         self.blackKingLocation = (0, 4)
-        self.inCheck = False
+        self.in_check = False
         self.pins = []
         self.checks = []
         self.checkMate = False
@@ -55,7 +55,6 @@ class GameState():
             # Grab the color of the pawn and then make it a queen
         
         if move.isEnpassantMove:
-            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             # Remove the pawn being captured (it's on the previous row, same col as end)
             if move.pieceMoved[0] == 'w':
                 self.board[move.endRow + 1][move.endCol] = '--'
@@ -150,6 +149,16 @@ class GameState():
         else:
             # Not in check so all moves are fine
             moves = self.get_all_possible_moves()
+        
+        if len(moves) == 0:
+            if self.in_check:
+                self.checkMate = True
+
+            else:
+                self.staleMate = True
+        else:
+            self.checkMate = False
+            self.staleMate = False
 
         return moves
     
@@ -264,8 +273,6 @@ class GameState():
                 if (row + 1, col + 1) == self.enpassantPossible:
                     if not piecePinned or pinDirection == (1, 1):
                         moves.append(Move((row, col), (row + 1, col + 1), self.board, isEnpassantMove=True))
-
-
 
     '''
     Get all of the rook moves for a rook at row, col, and add the moves to the list
