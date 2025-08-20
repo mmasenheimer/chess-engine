@@ -46,6 +46,10 @@ def main():
     playerClicks = []
     # Keep track of clicks (2 tuples: [(6, 4), (4, 4)])
     gameOver = False
+    # If human is playing white, then this is true, if AI is playing, false
+    playerOne = True
+    # Same for above but for black
+    playerTwo = False
 
     while running:
         for e in p.event.get():
