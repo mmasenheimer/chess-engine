@@ -4,7 +4,7 @@ handling user input and displaying the current game state.
 '''
 
 import pygame as p
-import ChessEngine
+import ChessEngine, moveFinder
 
 WIDTH = 512
 HEIGHT = 512
@@ -52,6 +52,8 @@ def main():
     playerTwo = False
 
     while running:
+        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
+
         for e in p.event.get():
 
             if e.type == p.QUIT:
@@ -59,7 +61,7 @@ def main():
 
             # Mouse handlers
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver:
+                if not gameOver and humanTurn:
                     location = p.mouse.get_pos()
                     # Get the xy position of the mouse click
 
@@ -105,6 +107,12 @@ def main():
                     playerClicks = []
                     move_made = False
         
+        # AI move finder
+        if not gameOver and not humanTurn:
+            AIMove = moveFinder.findRandomMove(valid_moves)
+            gs.make_move(AIMove)
+            move_made = True
+
         if move_made:
             valid_moves = gs.get_valid_moves()
             move_made = False
