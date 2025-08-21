@@ -30,3 +30,7 @@
 # 7/21/2025
 
 - Added a highlight move feature and move animations
+
+# 8/20/2025
+
+- Added a random move AI to play against, naive engine
