@@ -93,6 +93,9 @@ class GameState():
             if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
                 # Undo 2-square pawn advance
                 self.enpassantPossible = ()
+                
+        self.checkMate = False
+        self.staleMate = False
 
     """All moves considering checks"""
     def get_valid_moves(self):

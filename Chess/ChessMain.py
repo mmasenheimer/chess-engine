@@ -98,6 +98,7 @@ def main():
                     # Undo move when z is pressed
                     gs.undo_move()
                     move_made = True
+                    gameOver = False
                 
                 if e.key == p.K_r:
                     # Reset the board if 'r' is pressed
@@ -106,6 +107,7 @@ def main():
                     sqSelected = ()
                     playerClicks = []
                     move_made = False
+                    gameOver = False
         
         # AI move finder
         if not gameOver and not humanTurn:

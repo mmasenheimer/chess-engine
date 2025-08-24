@@ -21,29 +21,36 @@ def findBestMove(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
     opponentMinMaxScore = CHECKMATE
     bestPlayerMove = None
+    # Shuffle the moves so the AI doesn't pick the top move every time
     random.shuffle(validMoves)
 
     for playerMove in validMoves:
         gs.make_move(playerMove)
         opponentsMoves = gs.get_valid_moves()
-    
-        opponentMaxScore = -CHECKMATE
-        for opponentsMove in opponentsMoves:
-            gs.make_move(opponentsMove)
+        if gs.staleMate:
+            opponentMaxScore = STALEMATE
 
-            if gs.checkMate:
-                score = -turnMultiplier * CHECKMATE
+        elif gs.checkMate:
+            opponentMaxScore = -CHECKMATE
+        
+        else:
+            opponentMaxScore = -CHECKMATE
+            for opponentsMove in opponentsMoves:
+                gs.make_move(opponentsMove)
 
-            elif gs.staleMate:
-                score = 0
+                if gs.checkMate:
+                    score = -turnMultiplier * CHECKMATE
 
-            else:
-                score = -turnMultiplier * scoreMaterial(gs.board)
+                elif gs.staleMate:
+                    score = 0
 
-            if score > opponentMaxScore:
-                opponentMaxScore = score
+                else:
+                    score = -turnMultiplier * scoreMaterial(gs.board)
 
-            gs.undo_move()
+                if score > opponentMaxScore:
+                    opponentMaxScore = score
+
+                gs.undo_move()
 
         if opponentMaxScore < opponentMinMaxScore:
             opponentMinMaxScore = opponentMaxScore
@@ -51,6 +58,16 @@ def findBestMove(gs, validMoves):
         gs.undo_move()
 
     return bestPlayerMove
+
+'''
+MinMax AI algorithm setting the recursive depth based on how good the ai will be,
+deptch correlates to how many moves the ai will look foreward
+'''
+def findMoveMinMax(gs, validMoves, depth, whiteToMove):
+    # Implemented using minMax Ai algorithm
+
+    pass
+
 
 '''
 Score the board based on material
