@@ -52,7 +52,6 @@ def findBestMove(gs, validMoves):
 
     return bestPlayerMove
 
-
 '''
 Score the board based on material
 '''
