@@ -19,17 +19,20 @@ Find the best board position and maximizing the ai's score by material alone-- L
 def findBestMove(gs, validMoves):
     print("Greedy")
     turnMultiplier = 1 if gs.whiteToMove else -1
-    opponentsMinMaxScore = CHECKMATE
-    bestMove = None
+    opponentMinMaxScore = CHECKMATE
+    bestPlayerMove = None
+    random.shuffle(validMoves)
 
     for playerMove in validMoves:
         gs.make_move(playerMove)
         opponentsMoves = gs.get_valid_moves()
+    
+        opponentMaxScore = -CHECKMATE
         for opponentsMove in opponentsMoves:
             gs.make_move(opponentsMove)
 
             if gs.checkMate:
-                score = -CHECKMATE
+                score = -turnMultiplier * CHECKMATE
 
             elif gs.staleMate:
                 score = 0
@@ -37,14 +40,17 @@ def findBestMove(gs, validMoves):
             else:
                 score = -turnMultiplier * scoreMaterial(gs.board)
 
-            if score > maxScore:
-                maxScore = score
-                bestMove = playerMove
+            if score > opponentMaxScore:
+                opponentMaxScore = score
+
             gs.undo_move()
 
+        if opponentMaxScore < opponentMinMaxScore:
+            opponentMinMaxScore = opponentMaxScore
+            bestPlayerMove = playerMove
         gs.undo_move()
 
-    return bestMove
+    return bestPlayerMove
 
 
 '''
