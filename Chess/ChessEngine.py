@@ -1,10 +1,8 @@
 '''
-This class is responsible for storing info about the current game state,
-it's also responsible for determining the legality of moves and updating the game state.
-It also keeps a move log.
+File responsible for storing info about the current game state,
+also responsible for determining the legality of moves and updating the game state
 '''
 import random
-import moveFinder
 
 class GameState():
     def __init__(self):
@@ -69,8 +67,9 @@ class GameState():
         else:
             self.enpassantPossible = ()
 
-
-    """Undo the last move made"""
+    '''
+    Undo the previous move
+    '''
     def undo_move(self):
         if len(self.moveLog) != 0:
             # Make sure there exists a move to undo
@@ -116,7 +115,6 @@ class GameState():
         else:
             kingRow = self.blackKingLocation[0]
             kingCol = self.blackKingLocation[1]
-        # Getting which king
         
         if self.inCheck:
             if len(self.checks) == 1:
@@ -457,7 +455,7 @@ class GameState():
                     elif endPiece[0] == enemyColor:
                         type = endPiece[1]
                         '''
-                        There are 5 possibilities in this conditional:
+                        5 possibilities:
                         1) orthogonally away from king and piece is a rook
                         2) diagonally away from king and piece is a bishop
                         3) 1 square away diagonally from king and piece is a bishop
@@ -482,7 +480,7 @@ class GameState():
                             # Enemy piece not applying check
                             break
                 else:
-                    # Off the board
+                    # Off board
                     break
 
         # Check for knight checks
@@ -512,6 +510,7 @@ class Move ():
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveId = self.startRow * 1000 + self.startCol * 100 + self.endRow * 10 + self.endCol
+        self.castle = "idk"
         # Generating a unique ID for every move
 
         self.isPawnPromotion = False
@@ -521,6 +520,9 @@ class Move ():
         self.isEnpassantMove = isEnpassantMove
         if self.isEnpassantMove:
             self.pieceCaptured = "wP" if self.pieceMoved == "bP" else "bP"
+        
+        self.isCapture = self.pieceCaptured != "--"
+    
         
         print(self.moveId)
         print(random.randint(1, 5) * "*")
@@ -538,3 +540,24 @@ class Move ():
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
     
+    def __str__(self):
+        if self.castle == "yeah":
+            return "O-O" if self.endCol == 6 else "0-0-0"
+        
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+
+        # Pawn moves
+        if self.pieceMoved[1] == 'P':
+            if self.isCapture:
+                return self.colsToFiles[self.startCol] + "X" + endSquare
+            else:
+                return endSquare
+            
+        # TODO pawn promotion and two of the same types of pieces going to the same square
+        # TODO + for check and # for checkmate
+
+        # Piece moves
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += "X"
+        return moveString + endSquare

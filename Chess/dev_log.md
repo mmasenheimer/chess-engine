@@ -34,3 +34,12 @@
 # 8/20/2025
 
 - Added a random move AI to play against, naive engine
+
+# 8/24/2025
+
+- Cleaned up repetative code and focussed on clean comments/variable names
+- Added alpha beta pruning, improved nega max speed by 30%
+
+# 8/25/2025
+
+- Added a move log sidebar to keep track of each move in the UI

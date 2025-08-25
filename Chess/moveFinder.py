@@ -1,12 +1,12 @@
 import random
 
-# Rank the pieces by point value
+# Rank the pieces by point value TODO adjust weights
 pieceScores = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "P": 1}
 global counter
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
+DEPTH = 1
 
 '''
 Look at all possible moves and choose a random one-- LEVEL 1
@@ -14,7 +14,6 @@ Look at all possible moves and choose a random one-- LEVEL 1
 def findRandomMove(validMoves):
     print("random")
     return validMoves[random.randint(0, len(validMoves) - 1)]
-
 
 '''
 Find the best board position and maximizing the ai's score by material alone-- LEVEL 2
@@ -110,7 +109,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         return minScore
 
 '''
-Recursive method to clean up minMax
+MinMax cleaner recursive implementation
 '''
 def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
     # 1 for white's turn, -1 for black
@@ -133,7 +132,7 @@ def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
     return maxScore
 
 '''
-AlphaBeta nega max AI with pruning for optomization
+AlphaBeta nega max AI with pruning for optomization (Variable depth set)
 '''
 def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
     # 1 for white's turn, -1 for black
@@ -164,17 +163,16 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
             break
     
     return maxScore
-'''
-A positive score is good for white, and a negative score is good for black
-'''
+
 def scoreBoard(gs):
+    # + - good for white and black respectively
     if gs.checkMate:
         if gs.whiteToMove:
             return -CHECKMATE
-            # Black wins
+            # Black win
         else:
             return CHECKMATE
-            # White wins
+            # White win
     elif gs.staleMate:
         return STALEMATE
 
@@ -188,7 +186,7 @@ def scoreBoard(gs):
     return score
 
 '''
-Score the board based on material
+Score the board based on material TODO Adjust scoring parameters
 '''
 def scoreMaterial(board):
     score = 0
