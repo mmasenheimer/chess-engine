@@ -79,6 +79,7 @@ def main():
                     if (len(playerClicks) == 2):
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                         print(move.getChessNotation())
+                        print("...")
 
                         for i in range(len(valid_moves)):
 
@@ -111,7 +112,7 @@ def main():
         
         # AI move finder
         if not gameOver and not humanTurn:
-            AIMove = moveFinder.findBestMoveMinMax(gs, valid_moves)
+            AIMove = moveFinder.findBestMove(gs, valid_moves)
 
             if AIMove is None:
                 AIMove = moveFinder.findRandomMove(valid_moves)
@@ -137,6 +138,7 @@ def main():
 
         clock.tick(MAX_FPS)
         p.display.flip()
+    print(str(moveFinder.counter) + " moves evaluated")
 
 def highlightSquares(screen, gs, validMoves, sqSelected):
     if sqSelected != ():
@@ -172,7 +174,6 @@ def draw_board(screen):
 
             color = colors[(row + col) % 2]
             p.draw.rect(screen, color, p.Rect(col * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
-
 
 def draw_pieces(screen, board):
    

@@ -2,10 +2,11 @@ import random
 
 # Rank the pieces by point value
 pieceScores = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "P": 1}
+global counter
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 2
+DEPTH = 3
 
 '''
 Look at all possible moves and choose a random one-- LEVEL 1
@@ -14,11 +15,11 @@ def findRandomMove(validMoves):
     print("random")
     return validMoves[random.randint(0, len(validMoves) - 1)]
 
+
 '''
 Find the best board position and maximizing the ai's score by material alone-- LEVEL 2
 '''
-def findBestMove(gs, validMoves):
-    print("Greedy")
+def findBestMoveMinMaxNoRecursion(gs, validMoves):
     turnMultiplier = 1 if gs.whiteToMove else -1
     opponentMinMaxScore = CHECKMATE
     bestPlayerMove = None
@@ -60,16 +61,22 @@ def findBestMove(gs, validMoves):
 
     return bestPlayerMove
 
-# Helper method to make the first recursive call
-def findBestMoveMinMax(gs, validMoves):
-    global nextMove
+'''
+Helper method to call inital alpha beta function
+'''
+def findBestMove(gs, validMoves):
+    global nextMove, counter
     nextMove = None
-    findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
+    random.shuffle(validMoves)
+    counter = 0
+    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
+    print(str(counter) + " Moves evaluated")
+    #findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
     return nextMove
 
 '''
 MinMax AI algorithm setting the recursive depth based on how good the ai will be,
-deptch correlates to how many moves the ai will look foreward
+depth correlates to how many moves the ai will look forward
 '''
 def findMoveMinMax(gs, validMoves, depth, whiteToMove):
     global nextMove
@@ -81,7 +88,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         for move in validMoves:
             gs.make_move(move)
             nextMoves = gs.get_valid_moves()
-            score = findMoveMinMax(gs, nextMoves, depth - 1, not whiteToMove)
+            score = findMoveMinMax(gs, nextMoves, depth - 1, False)
             if score > maxScore:
                 maxScore = score
                 if depth == DEPTH:
@@ -102,6 +109,61 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
             gs.undo_move()
         return minScore
 
+'''
+Recursive method to clean up minMax
+'''
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
+    # 1 for white's turn, -1 for black
+    global nextMove
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.make_move(move)
+        nextMoves = gs.get_valid_moves()
+        score = -findMoveNegaMax(gs, nextMoves, depth-1, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+
+        gs.undo_move()
+    
+    return maxScore
+
+'''
+AlphaBeta nega max AI with pruning for optomization
+'''
+def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
+    # 1 for white's turn, -1 for black
+    # Alpha upper-bound, beta lower-bound
+    global nextMove, counter
+    counter += 1
+    if depth == 0:
+        return turnMultiplier * scoreBoard(gs)
+    
+    # move ordering - implement later
+    
+    maxScore = -CHECKMATE
+    for move in validMoves:
+        gs.make_move(move)
+        nextMoves = gs.get_valid_moves()
+        score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth-1, -beta, -alpha, -turnMultiplier)
+        if score > maxScore:
+            maxScore = score
+            if depth == DEPTH:
+                nextMove = move
+
+        gs.undo_move()
+        if maxScore > alpha:
+            # Pruning
+            alpha = maxScore
+        
+        if alpha >= beta:
+            break
+    
+    return maxScore
 '''
 A positive score is good for white, and a negative score is good for black
 '''

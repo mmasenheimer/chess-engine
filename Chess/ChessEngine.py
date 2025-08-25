@@ -3,6 +3,8 @@ This class is responsible for storing info about the current game state,
 it's also responsible for determining the legality of moves and updating the game state.
 It also keeps a move log.
 '''
+import random
+import moveFinder
 
 class GameState():
     def __init__(self):
@@ -521,6 +523,7 @@ class Move ():
             self.pieceCaptured = "wP" if self.pieceMoved == "bP" else "bP"
         
         print(self.moveId)
+        print(random.randint(1, 5) * "*")
     
     def __eq__(self, other):
 
@@ -534,3 +537,4 @@ class Move ():
     
     def getRankFile(self, r, c):
         return self.colsToFiles[c] + self.rowsToRanks[r]
+    
