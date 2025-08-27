@@ -98,14 +98,10 @@ class GameState():
         self.checkMate = False
         self.staleMate = False
 
-    """All moves considering checks"""
+    '''
+    Getting all of the valid moves considering checks
+    '''
     def get_valid_moves(self):
-        # # ----Naive algorithm (First iteration, slower):----
-        # # 1. Generate all possible moves
-        # # 2. For each move, make the move
-        # # 3. Generate all oponent's moves
-        # # 4. For each oponents moves, see if they attack the king
-        # ----Faster algorithm----
         moves = []
         self.inCheck, self.pins, self.checks = self.checkForPinsAndChecks()
         if self.whiteToMove:
@@ -523,7 +519,6 @@ class Move ():
         
         self.isCapture = self.pieceCaptured != "--"
     
-        
         print(self.moveId)
         print(random.randint(1, 5) * "*")
     
