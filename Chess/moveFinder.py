@@ -73,7 +73,7 @@ global counter
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 6
+DEPTH = 1
 
 '''
 Look at all possible moves and choose a random one-- LEVEL 1
