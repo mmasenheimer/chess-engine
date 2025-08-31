@@ -5,6 +5,7 @@ handling user input and displaying the current game state.
 
 import pygame as p
 import ChessEngine, moveFinder
+from multiprocessing import Process, Queue
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 175
@@ -50,6 +51,9 @@ def main():
     # If human is playing white, then this is true, if AI is playing, false
     playerOne = True
     playerTwo = False
+    AIThinking = False
+    moveFinderProcess = None
+    moveUndone = False
 
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
@@ -60,7 +64,7 @@ def main():
 
             # Mouse handlers
             elif e.type == p.MOUSEBUTTONDOWN:
-                if not gameOver and humanTurn:
+                if not gameOver:
                     location = p.mouse.get_pos()
 
                     col = location[0] // SQ_SIZE
@@ -74,7 +78,7 @@ def main():
                         sqSelected = (row, col)
                         playerClicks.append(sqSelected)
                     
-                    if (len(playerClicks) == 2):
+                    if (len(playerClicks) == 2) and humanTurn:
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                         print(move.getChessNotation())
                         print("...")
@@ -97,6 +101,10 @@ def main():
                     gs.undo_move()
                     move_made = True
                     gameOver = False
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False
+                    moveUndone = True
                 
                 if e.key == p.K_r:
                     # Reset the board if 'r' is pressed
@@ -106,20 +114,41 @@ def main():
                     playerClicks = []
                     move_made = False
                     gameOver = False
+                    if AIThinking:
+                        moveFinderProcess.terminate()
+                        AIThinking = False
+                    moveUndone = True
         
         # AI move finder
-        if not gameOver and not humanTurn:
-            AIMove = moveFinder.findBestMove(gs, valid_moves)
+        if not gameOver and not humanTurn and not moveUndone:
+            if not AIThinking:
+                AIThinking = True
+                print("loading...")
+                returnQueue = Queue()
+                # Used to pass data between threads
 
-            if AIMove is None:
-                AIMove = moveFinder.findRandomMove(valid_moves)
+                moveFinderProcess = Process(target=moveFinder.findBestMove, args=(gs, valid_moves, returnQueue))
+                moveFinderProcess.start()
 
-            gs.make_move(AIMove)
-            move_made = True
+            if not moveFinderProcess.is_alive():
+                print("finished")
+                result = returnQueue.get()
+                if isinstance(result, tuple):
+                    AIMove, moveFinder.counter = result
+                else:
+                    AIMove = result
+                    moveFinder.counter = 0
+                
+                if AIMove is None:
+                    AIMove = moveFinder.findRandomMove(valid_moves)
+                gs.make_move(AIMove)
+                move_made = True
+                AIThinking = False
 
         if move_made:
             valid_moves = gs.get_valid_moves()
             move_made = False
+            moveUndone = False
 
         draw_game_state(screen, gs, valid_moves, sqSelected, moveLogFont)
         if gs.checkMate or gs.staleMate:
@@ -132,6 +161,23 @@ def main():
         clock.tick(MAX_FPS)
         p.display.flip()
     print(str(moveFinder.counter) + " moves evaluated")
+    screen.blit(evalText, evalTextLocation)
+
+def numMoves(counter):
+    global evalText, evalTextLocation
+    font = p.font.SysFont("Arial", 14, False, False)  # Need to define the font
+    evalText = f"Moves Evaluated: {counter}"  # Use the parameter, not moveFinder.counter
+    evalTextObject = font.render(evalText, True, p.Color("yellow"))
+
+    # Need to define moveLogRect and padding since they're not available in this scope
+    moveLogRect = p.Rect(BOARD_WIDTH, 0, MOVE_LOG_PANEL_WIDTH, MOVE_LOG_PANEL_HEIGHT)
+    padding = 5
+    
+    evalTextLocation = moveLogRect.move(
+        padding, 
+        MOVE_LOG_PANEL_HEIGHT - evalTextObject.get_height() - padding
+    )
+    
 
 '''
 Handles the graphics for current game state
@@ -143,6 +189,7 @@ def draw_game_state(screen, gs, validMoves, sqSelected, moveLogFont):
     draw_pieces(screen, gs.board)  
     # Draw pieces on top of those squares
     drawMoveLog(screen, gs, moveLogFont)
+
 
 '''
 Draw the squares on the board, where top left is always white
@@ -217,6 +264,7 @@ def drawMoveLog(screen, gs, font):
         textLocation = moveLogRect.move(padding, textY)
         screen.blit(textObject, textLocation)
         textY += textObject.get_height() + 1
+
 
 def drawEndGameText(screen, text):
     font = p.font.SysFont("Helvetca", 32, True, False)

@@ -1,5 +1,7 @@
 import random
+import ChessMain
 
+counter = 0
 # Rank the pieces by point value TODO adjust weights
 pieceScores = {"K": 0, "Q": 10, "R": 5, "B": 3, "N": 3, "P": 1}
 knightScores = [
@@ -69,11 +71,10 @@ blackPawnScores = [
 ]
 
 piecePositionScores = {"N": knightScores, "Q": queenScores, "B": bishopScores, "R": rookScores, "bP": blackPawnScores, "wP": whitePawnScores}
-global counter
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 1
+DEPTH = 4
 
 '''
 Look at all possible moves and choose a random one-- LEVEL 1
@@ -130,15 +131,17 @@ def findBestMoveMinMaxNoRecursion(gs, validMoves):
 '''
 Helper method to call inital alpha beta function
 '''
-def findBestMove(gs, validMoves):
+def findBestMove(gs, validMoves, returnQueue):
     global nextMove, counter
     nextMove = None
     random.shuffle(validMoves)
     counter = 0
     findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -CHECKMATE, CHECKMATE, 1 if gs.whiteToMove else -1)
     print(str(counter) + " Moves evaluated")
+
+
     #findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
-    return nextMove
+    returnQueue.put(nextMove, counter)
 
 '''
 MinMax AI algorithm setting the recursive depth based on how good the ai will be,

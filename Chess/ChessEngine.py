@@ -15,7 +15,7 @@ class GameState():
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["--", "--", "--", "--", "--", "--", "--", "--"],
             ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
-            ["wR", "wN", "wB", "wQ", "wK", "--", "wN", "wR"]
+            ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"]
         ]
         
         self.moveFunctions = {'P': self.getPawnMoves, "R": self.getRookMoves, "N": self.getKnightMoves,
@@ -40,6 +40,15 @@ class GameState():
     (will not work for castling, pawn promotion, and en-passant)
     '''
     def make_move(self, move):
+        # Check for en passant before updating the board
+        if move.pieceMoved[1] == "P" and move.startCol != move.endCol:
+            if self.board[move.endRow][move.endCol] == '--':
+                # Remove the pawn being captured (it's on the previous row, same col as end)
+                if move.pieceMoved[0] == 'w':
+                    self.board[move.endRow + 1][move.endCol] = '--'
+                else:
+                    self.board[move.endRow - 1][move.endCol] = '--'
+
         self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
         self.moveLog.append(move)
@@ -56,13 +65,6 @@ class GameState():
         if move.isPawnPromotion:
             self.board[move.endRow][move.endCol] = move.pieceMoved[0] + 'Q'
             # Grab the color of the pawn and then make it a queen
-        
-        if move.isEnpassantMove:
-            # Remove the pawn being captured (it's on the previous row, same col as end)
-            if move.pieceMoved[0] == 'w':
-                self.board[move.endRow + 1][move.endCol] = '--'
-            else:
-                self.board[move.endRow - 1][move.endCol] = '--'
 
         if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
             # Only on two square pawn advances
@@ -93,8 +95,12 @@ class GameState():
     def undo_move(self):
         if len(self.moveLog) != 0:
             # Make sure there exists a move to undo
-
             move = self.moveLog.pop()
+
+            is_enpassant = (move.pieceMoved[1] == "P" and 
+                       move.startCol != move.endCol and 
+                       move.pieceCaptured == '--')
+
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
@@ -104,12 +110,18 @@ class GameState():
                 self.whiteKingLocation = (move.startRow, move.startCol)
             elif move.pieceMoved == "bK":
                 self.blackKingLocation = (move.startRow, move.startCol)
-            
-            if move.isEnpassantMove:
+
+            if is_enpassant:
                 # Undo en passant move
                 self.board[move.endRow][move.endCol] = '--'
-                self.board[move.startRow][move.endCol] = move.pieceCaptured
+                if move.pieceMoved[0] == 'w':
+                    self.board[move.endRow + 1][move.endCol] = 'bP'
+
+                else:
+                    self.board[move.endRow - 1][move.endCol] = 'wP'
+
                 self.enpassantPossible = (move.endRow, move.endCol)
+        
             
             if move.pieceMoved[1] == "P" and abs(move.startRow - move.endRow) == 2:
                 # Undo 2-square pawn advance
@@ -563,7 +575,7 @@ class GameState():
                         self.blackKingLocation = (endRow, endCol)
                     
                     inCheck, _, _ = self.checkForPinsAndChecks()
-                    
+
                     if not inCheck:
                         moves.append(Move((row, col), (endRow, endCol), self.board))
                     
@@ -631,8 +643,8 @@ class Move ():
         
         self.isCapture = self.pieceCaptured != "--"
     
-        #print(self.moveId)
-        #print(random.randint(1, 5) * "*")
+        # print(self.moveId)
+        # print(random.randint(1, 5) * "*")
     
     def __eq__(self, other):
 
@@ -653,6 +665,9 @@ class Move ():
                 return "O-O-O"
             return "O-O"
         
+        # if self.isPawnPromotion:
+        #     return str(endSquare) + "=Q"
+        
         endSquare = self.getRankFile(self.endRow, self.endCol)
 
         # Pawn moves
@@ -661,8 +676,7 @@ class Move ():
                 return self.colsToFiles[self.startCol] + "X" + endSquare
             else:
                 return endSquare
-            
-        # TODO pawn promotion and two of the same types of pieces going to the same square
+
         # TODO + for check and # for checkmate
 
         # Piece moves
