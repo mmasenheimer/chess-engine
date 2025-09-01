@@ -43,3 +43,8 @@
 # 8/25/2025
 
 - Added a move log sidebar to keep track of each move in the UI
+
+# 8/31/2025
+
+- Added castling and multi threading
+- Fixed en passant bugs and added a few comments for clarity
