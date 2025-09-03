@@ -13,8 +13,7 @@ MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8
 SQ_SIZE = BOARD_HEIGHT // DIMENSION  
 
-MAX_FPS = 15  
-# Animations
+
 
 IMAGES = {}
 # Store images of pieces
@@ -48,9 +47,14 @@ def main():
     playerClicks = []
     # Keep track of clicks (2 tuples: [(6, 4), (4, 4)])
     gameOver = False
-    # If human is playing white, then this is true, if AI is playing, false
+    
+    # *************************
+    # False = AI player, True = human player
     playerOne = True
-    playerTwo = False
+    playerTwo = True
+    # *************************
+
+#
     AIThinking = False
     moveFinderProcess = None
     moveUndone = False
@@ -81,7 +85,6 @@ def main():
                     if (len(playerClicks) == 2) and humanTurn:
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
                         print(move.getChessNotation())
-                        print("...")
 
                         for i in range(len(valid_moves)):
 
@@ -158,7 +161,7 @@ def main():
             else:
                 text = "Black wins by checkmate" if gs.whiteToMove else "White wins by checkmate"
             drawEndGameText(screen, text)
-        clock.tick(MAX_FPS)
+       
         p.display.flip()
     print(str(moveFinder.counter) + " moves evaluated")
     screen.blit(evalText, evalTextLocation)

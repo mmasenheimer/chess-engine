@@ -74,9 +74,8 @@ class GameState():
         
         # Castle move
         if (move.pieceMoved[1] == "K" and abs(move.endCol - move.startCol) > 1):
-            print("Made it into #1")
             if move.endCol - move.startCol == 2: # Kingside castle move
-                print("is a kingside castling move")
+        
                 self.board[move.endRow][move.endCol - 1] = self.board[move.endRow][7]
                 self.board[move.endRow][7] = '--'
             
@@ -643,9 +642,6 @@ class Move ():
         
         self.isCapture = self.pieceCaptured != "--"
     
-        # print(self.moveId)
-        # print(random.randint(1, 5) * "*")
-    
     def __eq__(self, other):
 
         if isinstance(other, Move):
@@ -664,9 +660,6 @@ class Move ():
             if self.startCol - self.endCol > 1:
                 return "O-O-O"
             return "O-O"
-        
-        # if self.isPawnPromotion:
-        #     return str(endSquare) + "=Q"
         
         endSquare = self.getRankFile(self.endRow, self.endCol)
 
