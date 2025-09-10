@@ -10,4 +10,5 @@ For the level of the AI, navigate to Chess > moveFinder > and set the depth to l
 # Installation:
 Clone the repository: git clone https://github.com/yourusername/chess-engine.git
 
-install the dependencies: pip install pygame
+install the dependencies in a terminal: pip install pygame
+
