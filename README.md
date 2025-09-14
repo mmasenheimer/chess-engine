@@ -12,3 +12,4 @@ Clone the repository: git clone https://github.com/yourusername/chess-engine.git
 
 install the dependencies in a terminal: pip install pygame
 
+ 
