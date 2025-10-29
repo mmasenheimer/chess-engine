@@ -5,7 +5,10 @@ handling user input and displaying the current game state.
 
 import pygame as p
 import ChessEngine, moveFinder
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, freeze_support
+
+import sys
+import os
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 175
@@ -13,7 +16,13 @@ MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
 DIMENSION = 8
 SQ_SIZE = BOARD_HEIGHT // DIMENSION  
 
-
+def resource_path(relative_path):
+    # Works for dev and PyInstaller exe
+    try:
+        base_path = sys._MEIPASS  # Temporary folder PyInstaller uses
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 IMAGES = {}
 # Store images of pieces
@@ -22,7 +31,8 @@ def load_images():
     # Runs once before the game starts
     pieces = ["bR", "bN", "bB", "bQ", "bK", "bP", "wR", "wN", "wB", "wQ", "wK", "wP"]
     for piece in pieces:
-        IMAGES[piece] = p.transform.scale(p.image.load("Chess/images/" + piece + ".png"), (SQ_SIZE, SQ_SIZE))
+        path = resource_path("Chess/images/" + piece + ".png")
+        IMAGES[piece] = p.transform.scale(p.image.load(path), (SQ_SIZE, SQ_SIZE))
     # Can access an image by calling the IMAGES key
 
 def main():
@@ -54,7 +64,6 @@ def main():
     playerTwo = True
     # *************************
 
-#
     AIThinking = False
     moveFinderProcess = None
     moveUndone = False
@@ -164,7 +173,7 @@ def main():
        
         p.display.flip()
     print(str(moveFinder.counter) + " moves evaluated")
-    screen.blit(evalText, evalTextLocation)
+    #screen.blit(evalText, evalTextLocation)
 
 def numMoves(counter):
     global evalText, evalTextLocation
@@ -276,4 +285,5 @@ def drawEndGameText(screen, text):
     screen.blit(textObject, textLoaction)
 
 if __name__ == "__main__":
+    freeze_support()
     main()

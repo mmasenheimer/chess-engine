@@ -74,7 +74,7 @@ piecePositionScores = {"N": knightScores, "Q": queenScores, "B": bishopScores, "
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 4
+DEPTH = 3
 
 '''
 Look at all possible moves and choose a random one-- LEVEL 1
